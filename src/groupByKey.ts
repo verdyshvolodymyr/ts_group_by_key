@@ -4,29 +4,30 @@ type GroupsMap<T> = {
   [key: string]: T[];
 };
 
-export function groupByKey<T>(items: [], key: keyof T): GroupsMap<T> {
+export function groupByKey<T extends object>(items: T[], key: keyof T): GroupsMap<T> {
   const keys: string[] = [];
-  const result: { [key: string]: any } = {};
+  const result: GroupsMap<T> = {};
 
   for (let i = 0; i < items.length; i++) {
-    if (key in items[i]) {
-      if (keys.includes(items[i][key])) {
-        continue;
-      }
+    const value = String(items[i][key]);
 
-      keys.push(items[i][key]);
+    if (!keys.includes(value)) {
+      keys.push(value);
     }
   }
 
   for (let i = 0; i < keys.length; i++) {
-    for (let y = 0; y < items.length; y++) {
-      if (Object.values(items[y]).includes(keys[i])) {
-        if (keys[i] in result) {
-          result[keys[i]].push(items[y]);
-          continue;
-        }
+    const group = keys[i];
 
-        result[keys[i]] = [items[y]];
+    for (let y = 0; y < items.length; y++) {
+      const itemValue = String(items[y][key]);
+
+      if (itemValue === group) {
+        if (group in result) {
+          result[group].push(items[y]);
+        } else {
+          result[group] = [items[y]];
+        }
       }
     }
   }
